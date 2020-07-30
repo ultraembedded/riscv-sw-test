@@ -1,0 +1,19 @@
+###############################################################################
+# Run
+###############################################################################
+RUN_AS_ROOT ?= no
+ifeq ($(RUN_AS_ROOT),yes)
+  SUDO_PREFIX=sudo
+else
+  SUDO_PREFIX=
+endif
+
+ifeq ($(PLATFORM),newlib-sim)
+  REPO_EXACTSTEP ?= ~/repo/exactstep
+  SIMULATOR  ?= exactstep --platform basic --march rv32im
+  RUN_PREFIX ?= $(SUDO_PREFIX) $(SIMULATOR) -b $(BASE_ADDRESS) -s $(MEM_SIZE) -f
+else
+  RUN_PREFIX  ?= 
+endif
+
+

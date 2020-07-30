@@ -1,0 +1,75 @@
+ifeq ($(MAKE_DIR),)
+${error - MAKE_DIR not specified}
+endif
+
+SW_ROOT := $(abspath $(MAKE_DIR)/..)
+
+###############################################################################
+# RISC-V Flags
+###############################################################################
+# GCC_PREFIX     = arch-toolchain-
+GCC_PREFIX=riscv32-unknown-elf-
+# ARCH_CFLAGS
+ARCH_CFLAGS=
+# ARCH_LFLAGS
+ARCH_LFLAGS=
+# FPIC           = yes | no
+FPIC = no
+# SHARED_LIB     = yes | no
+SHARED_LIB = no
+# COMPILER       = g++ | gcc
+COMPILER = gcc
+
+###############################################################################
+# Standard Directories
+###############################################################################
+SRC_DIR     += $(PLATFORM_DIR)
+SRC_DIR     += $(SW_ROOT)/drivers/uart
+SRC_DIR     += $(SW_ROOT)/sys
+
+###############################################################################
+# Platform
+###############################################################################
+PLATFORM    ?= newlib-sim
+PLATFORM_DIR = $(SW_ROOT)/arch/riscv
+
+BASE_ADDRESS ?= 0x80000000
+
+ifeq ($(PLATFORM),newlib-sim)
+  ARCH_CFLAGS += -DNEWLIB_SIM
+  ARCH_CFLAGS += -DNEWLIB -DCONFIG_ARCH_RISCV_SKIP_BSS_INIT
+  ARCH_LFLAGS += -nostartfiles -lgcc -lc -lm
+  NEWLIB = yes
+endif
+ifeq ($(PLATFORM),newlib-fpga)
+  ARCH_CFLAGS += -DNEWLIB_FPGA
+  ARCH_CFLAGS += -DNEWLIB
+  ARCH_LFLAGS += -nostartfiles -lgcc -lc -lm
+  NEWLIB = yes
+endif
+
+MEM_SIZE ?= 8388608
+
+ARCH_CFLAGS +=
+ARCH_LFLAGS += -Wl,--defsym=BASE_ADDRESS=$(BASE_ADDRESS)
+ARCH_LFLAGS += -Wl,--defsym=MEM_SIZE=$(MEM_SIZE)
+
+EXTRA_SRC := $(PLATFORM_DIR)/boot_newlib.S $(EXTRA_SRC)
+
+###############################################################################
+# Board Settings
+###############################################################################
+ARCH_LFLAGS += -T$(SW_ROOT)/arch/$(ARCH)/linker_script_newlib.ld
+
+###############################################################################
+# Super Mode
+###############################################################################
+SUPER_MODE ?= no
+ifneq ($(SUPER_MODE), no)
+  EXTRA_CFLAGS+= -DCONFIG_ARCH_RISCV_RUN_AS_SUPER
+endif
+
+###############################################################################
+# Run
+###############################################################################
+include $(MAKE_DIR)/makefile.run

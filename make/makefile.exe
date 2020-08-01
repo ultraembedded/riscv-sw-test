@@ -113,6 +113,9 @@ endef
 ###############################################################################
 BUILD_TARGETS = $(EXE_DIR)$(TARGET)
 
+ENABLE_BIN ?= yes
+ENABLE_LST ?= yes
+
 ifeq ($(ENABLE_BIN),yes)
   BUILD_TARGETS += $(EXE_DIR)$(TARGET).bin
 endif

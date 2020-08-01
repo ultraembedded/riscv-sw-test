@@ -20,6 +20,10 @@ SHARED_LIB = no
 # COMPILER       = g++ | gcc
 COMPILER = gcc
 
+ifeq (,$(shell which $(GCC_PREFIX)gcc))
+${error - RISC-V GCC tools not available on PATH}
+endif
+
 ###############################################################################
 # Standard Directories
 ###############################################################################

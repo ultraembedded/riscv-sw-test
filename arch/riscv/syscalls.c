@@ -23,6 +23,7 @@ extern ssize_t sys_read(int file, void *ptr, size_t len);
 extern ssize_t sys_write(int file, const void *ptr, size_t len);
 extern int     sys_close(int file);
 extern off_t   sys_lseek(int file, off_t ptr, int dir);
+extern int     sys_gettimeofday(struct timeval *tv, struct timezone *tz);
 
 //-------------------------------------------------------------
 // Locals:
@@ -160,20 +161,20 @@ struct irq_context *syscall_handler(struct irq_context *ctx)
     //else if (n == SYS_mmap)
     //else if (n == SYS_munmap)
     //else if (n == SYS_mremap)
-    else if (n == SYS_time)
-    {
-
-    }
     //else if (n == SYS_getmainvars)
     //else if (n == SYS_rt_sigaction)
-    //else if (n == SYS_writev)
+    //else if (n == SYS_writev)    
+    else if (n == SYS_time)
+    {
+        ctx->reg[REG_RET] = -1;
+    }
     else if (n == SYS_gettimeofday)
     {
-
+        ctx->reg[REG_RET] = sys_gettimeofday((struct timeval *)a0, (struct timezone *)a1);
     }
     else if (n == SYS_times)
     {
-
+        ctx->reg[REG_RET] = -1;
     }
     else if (n == SYS_fcntl)
     {

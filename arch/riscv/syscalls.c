@@ -9,13 +9,6 @@
 #include "console.h"
 
 //-------------------------------------------------------------
-// Defines:
-//-------------------------------------------------------------
-#ifndef CONFIG_HEAP_MEMSIZE
-#define CONFIG_HEAP_MEMSIZE         (4 << 20)
-#endif
-
-//-------------------------------------------------------------
 // External
 //-------------------------------------------------------------
 extern int     sys_open(const char *name, int flags, int mode);
@@ -24,12 +17,6 @@ extern ssize_t sys_write(int file, const void *ptr, size_t len);
 extern int     sys_close(int file);
 extern off_t   sys_lseek(int file, off_t ptr, int dir);
 extern int     sys_gettimeofday(struct timeval *tv, struct timezone *tz);
-
-//-------------------------------------------------------------
-// Locals:
-//-------------------------------------------------------------
-static uint8_t _malloc_mem[CONFIG_HEAP_MEMSIZE];
-static uint8_t *_mem_alloc = _malloc_mem;
 
 //-----------------------------------------------------------------
 // syscall_handler:
@@ -196,23 +183,10 @@ struct irq_context *syscall_handler(struct irq_context *ctx)
 
     return ctx;
 }
-//-------------------------------------------------------------
-// sbrk: Memory chunk allocator
-//-------------------------------------------------------------
-caddr_t _sbrk(int incr)
-{
-    uint8_t *p = _mem_alloc;
-    _mem_alloc += incr;
-
-    assert ((_mem_alloc - _malloc_mem) < CONFIG_HEAP_MEMSIZE);
-
-    return (caddr_t)p;
-}
 //-----------------------------------------------------------------
 // syscall_init:
 //-----------------------------------------------------------------
 void syscall_init(void)
 {
-    _mem_alloc = _malloc_mem;
     exception_set_syscall_handler(syscall_handler);
 }

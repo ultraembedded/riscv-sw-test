@@ -2,8 +2,8 @@
 # Makefile
 ###############################################################################
 SRC_DIR=.
-TARGET=test
-ARCH=riscv
+TARGET=helloworld
+ARCH ?= riscv
 
 MEM_SIZE     = 8388608
 EXTRA_CFLAGS+= -DNEWLIB_STACK_SIZE=1048576

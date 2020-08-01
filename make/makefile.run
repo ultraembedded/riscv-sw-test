@@ -9,8 +9,14 @@ else
 endif
 
 ifeq ($(PLATFORM),newlib-sim)
-  REPO_EXACTSTEP ?= ~/repo/exactstep
-  SIMULATOR  ?= exactstep --platform basic --march rv32im
+  
+  SIMULATOR_PATH ?= 
+
+  ifeq (,$(shell which $(SIMULATOR_PATH)exactstep))
+   ${error - EXACTSTEP simulator not available on PATH, set SIMULATOR_PATH instead?}
+  endif
+
+  SIMULATOR  ?= $(SIMULATOR_PATH)exactstep --platform basic --march rv32im
   RUN_PREFIX ?= $(SUDO_PREFIX) $(SIMULATOR) -b $(BASE_ADDRESS) -s $(MEM_SIZE) -f
 else
   RUN_PREFIX  ?= 

@@ -3,6 +3,7 @@
 ###############################################################################
 SRC_DIR=.
 TARGET=test
+ARCH=riscv
 
 MEM_SIZE     = 8388608
 EXTRA_CFLAGS+= -DNEWLIB_STACK_SIZE=1048576

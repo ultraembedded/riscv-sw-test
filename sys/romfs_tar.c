@@ -131,6 +131,7 @@ static uint32_t romfs_oct2uint(char * s, uint32_t size)
 //-----------------------------------------------------------------
 void romfs_tar_init(uint8_t *tar_file, uint32_t size)
 {
+    printf("TAR: %p size %d\n", tar_file, size);
     m_tar      = tar_file;
     m_tar_size = size;
 
@@ -214,6 +215,8 @@ int romfs_tar_open(const char *name, int flags, int mode)
 
         offset += (((size + BLOCKSIZE-1) / BLOCKSIZE) * BLOCKSIZE);
     }
+
+    return -1;
 }
 //-----------------------------------------------------------------
 // romfs_tar_read: read() for TAR filesystem

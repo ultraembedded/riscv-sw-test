@@ -88,3 +88,13 @@ _exit:
     csrw dscratch, a0
 _exit_loop:
     jal _exit_loop
+
+#####################################################
+# Embedded TAR filesystem
+#####################################################
+#ifdef CONFIG_ROMFS_TAR_SUPPORT
+.global _tarfs_start, _tarfs_end
+_tarfs_start:
+.incbin CONFIG_ROMFS_TAR_BIN
+_tarfs_end:
+#endif

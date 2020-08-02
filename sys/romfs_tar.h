@@ -2,6 +2,7 @@
 #define __ROMFS_TAR_H__
 
 #include <stdint.h>
+#include <sys/types.h>
 
 //-----------------------------------------------------------------
 // Prototypes:

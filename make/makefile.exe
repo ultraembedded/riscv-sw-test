@@ -85,6 +85,14 @@ LFLAGS        = $(ARCH_LFLAGS)
 LFLAGS       += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LFLAGS       += $(EXTRA_LIBS)
 
+# User provided directory to copy into the executable as a ROM filesystem
+ifneq ($(CONFIG_TAR_FS_DIR),)
+  CONFIG_ROMFS_TAR_BIN ?= $(OBJ_DIR)/tarfs.tar
+  CFLAGS += -DCONFIG_ROMFS_TAR_BIN=\"$(CONFIG_ROMFS_TAR_BIN)\"
+  CFLAGS += -DCONFIG_ROMFS_TAR_SUPPORT
+  CFLAGS += -DCONFIG_ROMFS_TAR_SYSCALLS
+endif
+
 ###############################################################################
 # Variables: Lists of objects, source and deps
 ###############################################################################
@@ -103,7 +111,7 @@ DEPS         ?= $(foreach src,$(SRC),$(call src2dep,$(src)))
 DEPFLAGS      = -MT $$@ -MMD -MP -MF $(call src2dep,$(1))
 
 define template_c
-$(call src2obj,$(1)): $(1) | $(OBJ_DIR) $(DEP_DIR)
+$(call src2obj,$(1)): $(1) | $(OBJ_DIR) $(DEP_DIR) $(CONFIG_ROMFS_TAR_BIN)
 	@echo "# Compiling $(notdir $(1))"
 	$(GCC) $(CFLAGS) $(DEPFLAGS) -c $$< -o $$@
 endef
@@ -122,29 +130,59 @@ endif
 ifeq ($(ENABLE_LST),yes)
   BUILD_TARGETS += $(EXE_DIR)$(TARGET).lst
 endif
+ifneq ($(CONFIG_ROMFS_TAR_BIN),)
+  BUILD_TARGETS += $(CONFIG_ROMFS_TAR_BIN)
+endif
 
 all: $(BUILD_TARGETS)
 
+###############################################################################
+# Rules: Directory creation
+###############################################################################
 $(OBJ_DIR) $(DEP_DIR) $(EXE_DIR):
 	@mkdir -p $@
 
+###############################################################################
+# Rules: TAR file creation
+###############################################################################
+$(CONFIG_ROMFS_TAR_BIN): | $(OBJ_DIR)
+	tar -cvf $(CONFIG_ROMFS_TAR_BIN) $(CONFIG_TAR_FS_DIR)
+
+###############################################################################
+# Rules: Compilation
+###############################################################################
 $(foreach src,$(SRC),$(eval $(call template_c,$(src))))
 
+###############################################################################
+# Rules: Linking
+###############################################################################
 $(EXE_DIR)$(TARGET): $(OBJ) | $(EXE_DIR) 
 	@echo "# Building $(notdir $@)"
 	$(GCC) -o $(EXE_DIR)$(TARGET) $(OBJ) $(LFLAGS)
 
+###############################################################################
+# Rules: ELF -> Bin
+###############################################################################
 $(EXE_DIR)$(TARGET).bin: $(EXE_DIR)$(TARGET)
 	@echo "# Building $(notdir $@)"
 	$(OBJCOPY) -O binary $< $@
 
+###############################################################################
+# Rules: ELF -> Listing
+###############################################################################
 $(EXE_DIR)$(TARGET).lst: $(EXE_DIR)$(TARGET)
 	@echo "# Building $(notdir $@)"
 	$(OBJDUMP) -d $< > $@
 
+###############################################################################
+# Rules: Run
+###############################################################################
 run:
 	$(RUN_PREFIX) $(EXE_DIR)$(TARGET) $(RUN_ARGS)
 
+###############################################################################
+# Rules: Clean
+###############################################################################
 clean:
 	rm -rf $(EXE_DIR) $(OBJ_DIR) $(DEP_DIR)
 

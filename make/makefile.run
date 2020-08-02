@@ -16,7 +16,11 @@ ifeq ($(PLATFORM),newlib-sim)
    ${error - EXACTSTEP simulator not available on PATH, set SIMULATOR_PATH instead?}
   endif
 
-  SIMULATOR  ?= $(SIMULATOR_PATH)exactstep --platform basic --march rv32im
+  ifeq ($(ARCH),riscv64)
+   SIMULATOR  ?= $(SIMULATOR_PATH)exactstep --platform basic --march rv64im
+  else
+   SIMULATOR  ?= $(SIMULATOR_PATH)exactstep --platform basic --march rv32im
+  endif
   RUN_PREFIX ?= $(SUDO_PREFIX) $(SIMULATOR) -b $(BASE_ADDRESS) -s $(MEM_SIZE) -f
 else
   RUN_PREFIX  ?= 

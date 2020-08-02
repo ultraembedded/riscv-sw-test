@@ -28,7 +28,7 @@ endif
 # Standard Directories
 ###############################################################################
 SRC_DIR     += $(PLATFORM_DIR)
-SRC_DIR     += $(SW_ROOT)/drivers/uart
+SRC_DIR     += $(wildcard $(SW_ROOT)/drivers/*)
 SRC_DIR     += $(SW_ROOT)/sys
 
 ###############################################################################

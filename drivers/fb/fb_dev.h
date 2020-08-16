@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------
 // Prototypes
 //-----------------------------------------------------------------
-void fbdev_init(uint32_t base_addr, uint32_t frame_buffer, int width, int height, int enable);
+void fbdev_init(uint32_t base_addr, uint32_t frame_buffer, int width, int height, int enable, int x2_mode);
 void fbdev_set_framebuffer(uint32_t frame_buffer);
 void fbdev_draw_pixel(uint16_t *frame, int x, int y, uint16_t colour);
 void fbdev_fill_screen(uint16_t *frame, uint16_t value);

@@ -8,6 +8,11 @@
 // Defines
 //-----------------------------------------------------------------
 #define VIDEO_CONFIG            0x0
+
+    #define VIDEO_CONFIG_X2_MODE                       2
+    #define VIDEO_CONFIG_X2_MODE_SHIFT                 2
+    #define VIDEO_CONFIG_X2_MODE_MASK                  0x1
+
     #define VIDEO_CONFIG_INT_EN_SOF                    1
     #define VIDEO_CONFIG_INT_EN_SOF_SHIFT              1
     #define VIDEO_CONFIG_INT_EN_SOF_MASK               0x1
@@ -37,7 +42,7 @@ static int m_fb_height;
 //-----------------------------------------------------------------
 // fbdev_init: Initialise frame buffer peripheral
 //-----------------------------------------------------------------
-void fbdev_init(uint32_t base_addr, uint32_t frame_buffer, int width, int height, int enable)
+void fbdev_init(uint32_t base_addr, uint32_t frame_buffer, int width, int height, int enable, int x2_mode)
 {
     m_fb = (volatile uint32_t *)base_addr;
 
@@ -45,7 +50,8 @@ void fbdev_init(uint32_t base_addr, uint32_t frame_buffer, int width, int height
     m_fb_height = height;
 
     m_fb[VIDEO_FRAME_BUFFER/4] = frame_buffer;
-    m_fb[VIDEO_CONFIG/4]       = 1 << VIDEO_CONFIG_ENABLE_SHIFT;
+    m_fb[VIDEO_CONFIG/4]       = (enable << VIDEO_CONFIG_ENABLE_SHIFT) |
+                                 (x2_mode << VIDEO_CONFIG_X2_MODE_SHIFT);
 }
 //-----------------------------------------------------------------
 // fbdev_set_framebuffer: Set new frame buffer address
